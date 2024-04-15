@@ -46,6 +46,40 @@ resource "aws_autoscaling_group" "example_asg" {
   }
 }
 
+
+# Create CloudWatch Metric Alarms for CPU Utilization
+resource "aws_cloudwatch_metric_alarm" "scale_out_cpu_alarm" {
+  alarm_name          = "scale-out-cpu-utilization"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 300  # 5 minutes
+  statistic           = "Average"
+  threshold           = 10
+  alarm_description   = "Alarm to scale out when CPU utilization is above 10%"
+  alarm_actions       = [aws_autoscaling_policy.scale_out_policy.arn]
+  dimensions = {
+    InstanceId = module.prod_instances.instance_ids[1]
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "scale_in_cpu_alarm" {
+  alarm_name          = "scale-in-cpu-utilization"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 300  # 5 minutes
+  statistic           = "Average"
+  threshold           = 5
+  alarm_description   = "Alarm to scale in when CPU utilization is below 5%"
+  alarm_actions       = [aws_autoscaling_policy.scale_in_policy.arn]
+  dimensions = {
+    InstanceId = module.prod_instances.instance_ids[1]
+  }
+}
+
 # Create Scaling Policy to scale out
 resource "aws_autoscaling_policy" "scale_out_policy" {
   name                   = var.scale_out_policy_name
