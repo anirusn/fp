@@ -38,6 +38,7 @@ resource "aws_autoscaling_group" "example_asg" {
   vpc_zone_identifier       = var.subnet_ids
   health_check_type         = "EC2"
   termination_policies      = ["Default"]
+  target_group_arns         = [var.target_group_arn] 
 
   tag {
     key                 = "Name"
@@ -98,7 +99,3 @@ resource "aws_autoscaling_policy" "scale_in_policy" {
   autoscaling_group_name = aws_autoscaling_group.example_asg.name
 }
 
-resource "aws_autoscaling_attachment" "example" {
-  autoscaling_group_name = var.asg_name
-  lb_target_group_arn   = var.lb_target_group_arn
-}
