@@ -9,7 +9,7 @@ terraform {
 }
 
 # Defining key pair
-resource "aws_key_pair" "Group16_prod_key_pair" {
+resource "aws_key_pair" "group16_prod_key_pair" {
   key_name   = "acs730"
   public_key = file("/home/ec2-user/environment/terraform-project/key/acs730.pub")  
 }
@@ -22,74 +22,74 @@ resource "aws_eip" "nat" {
 # creating nat gateway
 resource "aws_nat_gateway" "nat_gateway" {
   allocation_id = aws_eip.nat.id
-  subnet_id     = module.Group16_prod_subnets.subnet_ids[0]
+  subnet_id     = module.group16_prod_subnets.subnet_ids[0]
 
   tags = {
-    Name = "Group16-prod-nat-gateway"
+    Name = "group16-prod-nat-gateway"
   }
 }
 
 # creating internet gateway
-module "Group16_prod_internet_gateway" {
+module "group16_prod_internet_gateway" {
   source  = "/home/ec2-user/environment/terraform-project/modules/internet_gateway"
-  vpc_id  = module.Group16_prod_vpc.vpc_id
+  vpc_id  = module.group16_prod_vpc.vpc_id
 }
 
 
-module "Group16_prod_asg" {
+module "group16_prod_asg" {
   source = "/home/ec2-user/environment/terraform-project/modules/autoscaling" 
 
-  instance_id                    = module.Group16_prod_instances.instance_ids[1]
-  ami_name                       = "Group16-prod-ami"
-  ami_tag_name                   = "Group16-prod-ami"
-  launch_template_name           = "Group16_prod_lt"
+  instance_id                    = module.group16_prod_instances.instance_ids[1]
+  ami_name                       = "group16-prod-ami"
+  ami_tag_name                   = "group16-prod-ami"
+  launch_template_name           = "group16_prod_lt"
   instance_type                  = "t3.medium"
-  key_name                       = aws_key_pair.Group16_prod_key_pair.key_name
-  security_group_id              = module.Group16_prod_vms_sg.security_group_id
+  key_name                       = aws_key_pair.group16_prod_key_pair.key_name
+  security_group_id              = module.group16_prod_vms_sg.security_group_id
   volume_size                    = 20
-  asg_name                       = "Group16-prod-asg"
+  asg_name                       = "group16-prod-asg"
   min_size                       = 1
   max_size                       = 4
   desired_capacity               = 1
-  subnet_ids                     = [module.Group16_prod_subnets.subnet_ids[3], module.Group16_prod_subnets.subnet_ids[4], module.Group16_prod_subnets.subnet_ids[5]]
-  instance_tag_name              = "Group16-prod-VM+"
-  scale_out_policy_name          = "Group16-prod-scale-out"
+  subnet_ids                     = [module.group16_prod_subnets.subnet_ids[3], module.group16_prod_subnets.subnet_ids[4], module.group16_prod_subnets.subnet_ids[5]]
+  instance_tag_name              = "group16-prod-VM+"
+  scale_out_policy_name          = "group16-prod-scale-out"
   scale_out_scaling_adjustment   = 1
   scale_out_cooldown             = 300
-  scale_in_policy_name           = "Group16-prod-scale-in"
+  scale_in_policy_name           = "group16-prod-scale-in"
   scale_in_scaling_adjustment    = -1
   scale_in_cooldown              = 300
-  dim_instance_id                = module.Group16_prod_instances.instance_ids[1]
-  target_group_arn              = module.Group16_prod_load_balancer.target_group_arn
+  dim_instance_id                = module.group16_prod_instances.instance_ids[1]
+  target_group_arn              = module.group16_prod_load_balancer.target_group_arn
 }
 
 
 #creating prod resources
 
 #creating prod vpc
-module "Group16_prod_vpc" {
+module "group16_prod_vpc" {
   source = "/home/ec2-user/environment/terraform-project/modules/vpc"
   vpc_cidr_block       = "10.250.0.0/16"
   vpc_instance_tenancy = "default"
-  vpc_name             = "Group16-prod-vpc"
+  vpc_name             = "group16-prod-vpc"
 }
 
 #creating prod subnets
-module "Group16_prod_subnets" {
+module "group16_prod_subnets" {
   source            = "/home/ec2-user/environment/terraform-project/modules/subnet"
-  subnet_names      = ["Group16_prod_public1", "Group16_prod_public2", "Group16_prod_public3", "Group16_prod_private1", "Group16_prod_private2", "Group16_prod_private3"]
+  subnet_names      = ["group16_prod_public1", "group16_prod_public2", "group16_prod_public3", "group16_prod_private1", "group16_prod_private2", "group16_prod_private3"]
   subnet_cidr_blocks = ["10.250.1.0/24", "10.250.2.0/24", "10.250.3.0/24", "10.250.4.0/24", "10.250.5.0/24", "10.250.6.0/24"]
   availability_zones = ["us-east-1b", "us-east-1c", "us-east-1d", "us-east-1b", "us-east-1c", "us-east-1d"]
-  vpc_id            = module.Group16_prod_vpc.vpc_id
+  vpc_id            = module.group16_prod_vpc.vpc_id
   
 }
 
 #creating security group for prod bastion host
-module "Group16_prod_bastion_sg" {
+module "group16_prod_bastion_sg" {
   source              = "/home/ec2-user/environment/terraform-project/modules/security_group"
-  security_group_name = "Group16-prod-security-group_bastion"
+  security_group_name = "group16-prod-security-group_bastion"
   security_group_description = "Security group for prod environment"
-  vpc_id = module.Group16_prod_vpc.vpc_id
+  vpc_id = module.group16_prod_vpc.vpc_id
 
   ingress_rules = [
     {
@@ -113,11 +113,11 @@ module "Group16_prod_bastion_sg" {
 
 #creating security group for prod vms
 
-module "Group16_prod_vms_sg" {
+module "group16_prod_vms_sg" {
   source              = "/home/ec2-user/environment/terraform-project/modules/security_group"
-  security_group_name = "Group16-prod-security-group_vm"
+  security_group_name = "group16-prod-security-group_vm"
   security_group_description = "Security group for prod environment"
-  vpc_id = module.Group16_prod_vpc.vpc_id
+  vpc_id = module.group16_prod_vpc.vpc_id
 
   ingress_rules = [
     {
@@ -125,7 +125,7 @@ module "Group16_prod_vms_sg" {
       to_port     = 22
       protocol    = "tcp"
       cidr_blocks     = [] 
-      security_groups = [module.Group16_prod_bastion_sg.security_group_id]
+      security_groups = [module.group16_prod_bastion_sg.security_group_id]
     },
     
     {
@@ -147,28 +147,28 @@ module "Group16_prod_vms_sg" {
 
 
 #creating prod instances
-module "Group16_prod_instances" {
+module "group16_prod_instances" {
   source = "/home/ec2-user/environment/terraform-project/modules/instance"
 
   instances = [
     {
-      name          = "Group16-prod_bastion"
+      name          = "group16-prod_bastion"
       ami_id        = "ami-051f8a213df8bc089"
       instance_type = "t3.medium"
-      subnet_id     = module.Group16_prod_subnets.subnet_ids[0]
-      security_group_id = module.Group16_prod_bastion_sg.security_group_id
+      subnet_id     = module.group16_prod_subnets.subnet_ids[0]
+      security_group_id = module.group16_prod_bastion_sg.security_group_id
       assign_public_ip = true
-      key_name    = aws_key_pair.Group16_prod_key_pair.key_name
+      key_name    = aws_key_pair.group16_prod_key_pair.key_name
     },
     {
-      name          = "Group16-prod_vm"
+      name          = "group16-prod_vm"
       ami_id        = "ami-051f8a213df8bc089"
       instance_type = "t3.medium"
-      subnet_id     = module.Group16_prod_subnets.subnet_ids[4]
-      security_group_id = module.Group16_prod_vms_sg.security_group_id
+      subnet_id     = module.group16_prod_subnets.subnet_ids[4]
+      security_group_id = module.group16_prod_vms_sg.security_group_id
       user_data     = file("/home/ec2-user/environment/terraform-project/vm_user_data.sh")
       assign_public_ip = false
-      key_name    = aws_key_pair.Group16_prod_key_pair.key_name
+      key_name    = aws_key_pair.group16_prod_key_pair.key_name
 
     }
   ]
@@ -176,51 +176,51 @@ module "Group16_prod_instances" {
 
 
 #creating prod public route table
-module "Group16_prod_PublicRT" {
+module "group16_prod_PublicRT" {
   source     = "/home/ec2-user/environment/terraform-project/modules/route_table"
   
-  vpc_id     = module.Group16_prod_vpc.vpc_id
-  gateway_id = module.Group16_prod_internet_gateway.internet_gateway_id
-  subnet_id  = module.Group16_prod_subnets.subnet_ids[0]
+  vpc_id     = module.group16_prod_vpc.vpc_id
+  gateway_id = module.group16_prod_internet_gateway.internet_gateway_id
+  subnet_id  = module.group16_prod_subnets.subnet_ids[0]
 }
 
 #creating prod private route table
-module "Group16_prod_PrivateRT" {
+module "group16_prod_PrivateRT" {
   source     = "/home/ec2-user/environment/terraform-project/modules/route_table"
   
-  vpc_id     = module.Group16_prod_vpc.vpc_id
+  vpc_id     = module.group16_prod_vpc.vpc_id
   gateway_id = aws_nat_gateway.nat_gateway.id
-  subnet_id  = module.Group16_prod_subnets.subnet_ids[3]
+  subnet_id  = module.group16_prod_subnets.subnet_ids[3]
 }
 
 #creating prod route table asscociation
-module "Group16_prod_route_table_associations" {
+module "group16_prod_route_table_associations" {
   source = "/home/ec2-user/environment/terraform-project/modules/route_table_association"
 
   route_table_associations = [
     {
-      subnet_id      = module.Group16_prod_subnets.subnet_ids[0]
-      route_table_id = module.Group16_prod_PublicRT.route_table_id
+      subnet_id      = module.group16_prod_subnets.subnet_ids[0]
+      route_table_id = module.group16_prod_PublicRT.route_table_id
     },
     {
-      subnet_id      = module.Group16_prod_subnets.subnet_ids[1]
-      route_table_id = module.Group16_prod_PublicRT.route_table_id
+      subnet_id      = module.group16_prod_subnets.subnet_ids[1]
+      route_table_id = module.group16_prod_PublicRT.route_table_id
     },
     {
-      subnet_id      = module.Group16_prod_subnets.subnet_ids[2]
-      route_table_id = module.Group16_prod_PublicRT.route_table_id
+      subnet_id      = module.group16_prod_subnets.subnet_ids[2]
+      route_table_id = module.group16_prod_PublicRT.route_table_id
     },
     {
-      subnet_id      = module.Group16_prod_subnets.subnet_ids[3]
-      route_table_id = module.Group16_prod_PrivateRT.route_table_id 
+      subnet_id      = module.group16_prod_subnets.subnet_ids[3]
+      route_table_id = module.group16_prod_PrivateRT.route_table_id 
     },
     {
-      subnet_id      = module.Group16_prod_subnets.subnet_ids[4]
-      route_table_id = module.Group16_prod_PrivateRT.route_table_id 
+      subnet_id      = module.group16_prod_subnets.subnet_ids[4]
+      route_table_id = module.group16_prod_PrivateRT.route_table_id 
     },
     {
-      subnet_id      = module.Group16_prod_subnets.subnet_ids[5]
-      route_table_id = module.Group16_prod_PrivateRT.route_table_id 
+      subnet_id      = module.group16_prod_subnets.subnet_ids[5]
+      route_table_id = module.group16_prod_PrivateRT.route_table_id 
     }
     
   ]
@@ -229,16 +229,16 @@ module "Group16_prod_route_table_associations" {
 
 #create load balancer:
 # Use the load balancer module
-module "Group16_prod_load_balancer" {
+module "group16_prod_load_balancer" {
   source = "/home/ec2-user/environment/terraform-project/modules/loadbalancer"  
 
-  alb_name                         = "Group16-prod-alb"
-  subnet_ids                       = [module.Group16_prod_subnets.subnet_ids[0], module.Group16_prod_subnets.subnet_ids[1], module.Group16_prod_subnets.subnet_ids[2]]
-  security_group_id                = module.Group16_prod_vms_sg.security_group_id
+  alb_name                         = "group16-prod-alb"
+  subnet_ids                       = [module.group16_prod_subnets.subnet_ids[0], module.group16_prod_subnets.subnet_ids[1], module.group16_prod_subnets.subnet_ids[2]]
+  security_group_id                = module.group16_prod_vms_sg.security_group_id
   enable_deletion_protection       = false
-  target_group_name                = "Group16-prod-target-group"
+  target_group_name                = "group16-prod-target-group"
   target_group_port                = 80
-  vpc_id                           = module.Group16_prod_vpc.vpc_id
+  vpc_id                           = module.group16_prod_vpc.vpc_id
   health_check_path                = "/"
   health_check_port                = "traffic-port"
   health_check_interval            = 30
@@ -248,12 +248,12 @@ module "Group16_prod_load_balancer" {
   listener_port                    = 80
   listener_rule_priority           = 100
   listener_rule_path               = "/"
-  target_id                        = module.Group16_prod_instances.instance_ids[0]
+  target_id                        = module.group16_prod_instances.instance_ids[0]
 }
 
 # Output the DNS name of the created ALB
 output "alb_dns_name" {
-  value = module.Group16_prod_load_balancer.alb_dns_name
+  value = module.group16_prod_load_balancer.alb_dns_name
 }
 
 
