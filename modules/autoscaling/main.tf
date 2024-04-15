@@ -97,3 +97,8 @@ resource "aws_autoscaling_policy" "scale_in_policy" {
   cooldown               = var.scale_in_cooldown
   autoscaling_group_name = aws_autoscaling_group.example_asg.name
 }
+
+resource "aws_autoscaling_attachment" "example" {
+  autoscaling_group_name = var.asg_name
+  lb_target_group_arn   = var.lb_target_group_arn
+}

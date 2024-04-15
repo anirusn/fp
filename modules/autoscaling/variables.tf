@@ -82,3 +82,7 @@ variable "scale_in_scaling_adjustment" {
 variable "scale_in_cooldown" {
   description = "Cooldown period for scale in policy"
 }
+
+variable "lb_target_group_arn" {
+  description = "ARN of the ALB target group"
+}

@@ -35,6 +35,10 @@ module "my_internet_gateway" {
   vpc_id  = module.prod_vpc.vpc_id
 }
 
+data "aws_lb_target_group" "example" {
+  name = module.my_load_balancer.target_group_name
+}
+
 
 module "prod_asg" {
   source = "/home/ec2-user/environment/terraform-project/modules/autoscaling" 
@@ -60,6 +64,7 @@ module "prod_asg" {
   scale_in_scaling_adjustment    = -1
   scale_in_cooldown              = 300
   dim_instance_id            = module.prod_instances.instance_ids[1]
+  lb_target_group_arn   = data.aws_lb_target_group.example.arn
 }
 
 
@@ -131,8 +136,7 @@ module "prod_vms_sg" {
       from_port   = 80
       to_port     = 80
       protocol    = "tcp"
-      cidr_blocks     = [] 
-      security_groups = [module.prod_bastion_sg.security_group_id]
+      cidr_blocks     = ["0.0.0.0/0"] 
     }
   ]
   egress_rules = [
@@ -228,8 +232,6 @@ module "prod_route_table_associations" {
 
 
 #create load balancer:
-
-
 # Use the load balancer module
 module "my_load_balancer" {
   source = "/home/ec2-user/environment/terraform-project/modules/loadbalancer"  
@@ -256,6 +258,11 @@ module "my_load_balancer" {
 # Output the DNS name of the created ALB
 output "alb_dns_name" {
   value = module.my_load_balancer.alb_dns_name
+}
+
+output "target_group_arn" {
+  description = "ARN of the target group created by the load balancer module"
+  value       = aws_lb_target_group.example.arn
 }
 
 
