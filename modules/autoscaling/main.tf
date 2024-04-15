@@ -60,7 +60,7 @@ resource "aws_cloudwatch_metric_alarm" "scale_out_cpu_alarm" {
   alarm_description   = "Alarm to scale out when CPU utilization is above 10%"
   alarm_actions       = [aws_autoscaling_policy.scale_out_policy.arn]
   dimensions = {
-    InstanceId = module.prod_instances.instance_ids[1]
+    InstanceId = var.dim_instance_id
   }
 }
 
@@ -76,7 +76,7 @@ resource "aws_cloudwatch_metric_alarm" "scale_in_cpu_alarm" {
   alarm_description   = "Alarm to scale in when CPU utilization is below 5%"
   alarm_actions       = [aws_autoscaling_policy.scale_in_policy.arn]
   dimensions = {
-    InstanceId = module.prod_instances.instance_ids[1]
+    InstanceId = var.dim_instance_id
   }
 }
 

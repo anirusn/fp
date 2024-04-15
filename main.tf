@@ -52,13 +52,14 @@ module "prod_asg" {
   max_size                       = 4
   desired_capacity               = 1
   subnet_ids                     = [module.prod_subnets.subnet_ids[3], module.prod_subnets.subnet_ids[4], module.prod_subnets.subnet_ids[5]]
-  instance_tag_name              = "Group16-prod-instance"
+  instance_tag_name              = "Group16-prod-VM+"
   scale_out_policy_name          = "Group16-prod-scale-out"
   scale_out_scaling_adjustment   = 1
   scale_out_cooldown             = 300
   scale_in_policy_name           = "Group16-prod-scale-in"
   scale_in_scaling_adjustment    = -1
   scale_in_cooldown              = 300
+  dim_instance_id            = module.prod_instances.instance_ids[1]
 }
 
 
@@ -94,7 +95,7 @@ module "prod_bastion_sg" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_blocks = ["99.227.114.52/32"]
+      cidr_blocks = ["0.0.0.0/0"]
     }
    
   ]
@@ -259,88 +260,3 @@ output "alb_dns_name" {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# resource "aws_lb" "example_alb" {
-#   name               = "example-alb"
-#   load_balancer_type = "application"
-#   subnets = [module.prod_subnets.subnet_ids[0], module.prod_subnets.subnet_ids[1], module.prod_subnets.subnet_ids[2]]
-#   security_groups    = [module.prod_vms_sg.security_group_id]
-
-#   enable_deletion_protection = false  # Set to true if you want to enable deletion protection
-
-#   tags = {
-#     Name = "example-alb"
-#   }
-# }
-
-# resource "aws_lb_target_group" "example_target_group" {
-#   name     = "example-target-group"
-#   port     = 80
-#   protocol = "HTTP"
-#   vpc_id   = module.prod_vpc.vpc_id
-
-#   health_check {
-#     path                = "/"
-#     port                = "traffic-port"
-#     protocol            = "HTTP"
-#     interval            = 30
-#     timeout             = 10
-#     healthy_threshold   = 2
-#     unhealthy_threshold = 2
-#   }
-# }
-
-# resource "aws_lb_listener" "example_listener" {
-#   load_balancer_arn = aws_lb.example_alb.arn
-#   port              = 80
-#   protocol          = "HTTP"
-
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.example_target_group.arn
-#   }
-# }
-
-# resource "aws_lb_listener_rule" "example_listener_rule" {
-#   listener_arn = aws_lb_listener.example_listener.arn
-#   priority     = 100
-
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.example_target_group.arn
-#   }
-
-#   condition {
-#     path_pattern {
-#       values = ["/"]
-#     }
-#   }
-# }
-
-
-# resource "aws_lb_target_group_attachment" "example_attachment" {
-#   target_group_arn = aws_lb_target_group.example_target_group.arn
-#   target_id        = module.prod_instances.instance_ids[0]
-# }

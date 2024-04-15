@@ -2,6 +2,10 @@ variable "instance_id" {
   description = "ID of the source instance for creating AMI"
 }
 
+variable "dim_instance_id"{
+  description = "ID of the source instance for creating AMI"
+}
+
 variable "ami_name" {
   description = "Name of the AMI"
 }
