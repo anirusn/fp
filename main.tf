@@ -36,7 +36,7 @@ module "my_internet_gateway" {
 }
 
 
-module "my_ec2_asg" {
+module "prod_asg" {
   source = "/home/ec2-user/environment/terraform-project/modules/autoscaling" 
 
   instance_id                    = module.prod_instances.instance_ids[1]
@@ -53,10 +53,10 @@ module "my_ec2_asg" {
   desired_capacity               = 1
   subnet_ids                     = [module.prod_subnets.subnet_ids[3], module.prod_subnets.subnet_ids[4], module.prod_subnets.subnet_ids[5]]
   instance_tag_name              = "Group16-prod-instance"
-  scale_out_policy_name          = "cpu-utilization-scale-out"
+  scale_out_policy_name          = "Group16-prod-scale-out"
   scale_out_scaling_adjustment   = 1
   scale_out_cooldown             = 300
-  scale_in_policy_name           = "cpu-utilization-scale-in"
+  scale_in_policy_name           = "Group16-prod-scale-in"
   scale_in_scaling_adjustment    = -1
   scale_in_cooldown              = 300
 }
