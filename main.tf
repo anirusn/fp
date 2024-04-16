@@ -1,7 +1,7 @@
 #Terraform state file
 terraform {
   backend "s3" {
-    bucket         = "fpbucket730"
+    bucket         = "fpsbucket"
     key            = "terraform.tfstate"
     region         = "us-east-1"  
     encrypt        = true          
@@ -275,12 +275,12 @@ module "group16_prod_load_balancer" {
   health_check_port                = "traffic-port"
   health_check_interval            = 30
   health_check_timeout             = 10
-  health_check_healthy_threshold   = 2
-  health_check_unhealthy_threshold = 2
+  health_check_healthy_threshold   = 5
+  health_check_unhealthy_threshold = 10
   listener_port                    = 80
   listener_rule_priority           = 100
   listener_rule_path               = "/"
-  target_id                        = module.group16_prod_instances.instance_ids[0]
+  target_id                        = module.group16_prod_instances.instance_ids[1]
 }
 
 # Output the DNS name of the created ALB
