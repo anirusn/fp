@@ -111,6 +111,36 @@ module "group16_prod_bastion_sg" {
 }
 
 
+
+#creating security group for prod bastion host
+module "group16_prod_alb_sg" {
+  source              = "/home/ec2-user/environment/terraform-project/modules/security_group"
+  security_group_name = "group16-prod-security-group_alb"
+  security_group_description = "Security group for prod environment"
+  vpc_id = module.group16_prod_vpc.vpc_id
+
+  ingress_rules = [
+    {
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+   
+  ]
+  egress_rules = [
+    {
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  ]
+}
+
+
+
+
 #creating security group for prod vms
 
 module "group16_prod_vms_sg" {
@@ -132,7 +162,9 @@ module "group16_prod_vms_sg" {
       from_port   = 80
       to_port     = 80
       protocol    = "tcp"
-      cidr_blocks     = ["0.0.0.0/0"] 
+      cidr_blocks = [] 
+      security_groups = [module.group16_prod_alb_sg.security_group_id]
+
     }
   ]
   egress_rules = [
