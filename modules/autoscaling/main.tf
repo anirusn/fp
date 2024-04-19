@@ -7,6 +7,7 @@ resource "aws_ami_from_instance" "prod_ami" {
   }
 }
 
+
 # Create Launch Template
 resource "aws_launch_template" "example_lt" {
   name        = var.launch_template_name
@@ -14,6 +15,7 @@ resource "aws_launch_template" "example_lt" {
   instance_type            = var.instance_type
   key_name                 = var.key_name
   vpc_security_group_ids   = [var.security_group_id]
+  user_data         = filebase64("/home/ec2-user/environment/terraform-project/vm_user_data.sh")
 
   block_device_mappings {
     device_name = "/dev/xvda"
@@ -34,7 +36,7 @@ resource "aws_autoscaling_group" "example_asg" {
   }
   min_size                  = var.min_size
   max_size                  = var.max_size
-  desired_capacity          = var.desired_capacity
+  # desired_capacity          = var.desired_capacity
   vpc_zone_identifier       = var.subnet_ids
   health_check_type         = "EC2"
   termination_policies      = ["Default"]
@@ -58,7 +60,7 @@ resource "aws_cloudwatch_metric_alarm" "scale_out_cpu_alarm" {
   period              = 300  # 5 minutes
   statistic           = "Average"
   threshold           = 10
-  alarm_description   = "Alarm to scale out when CPU utilization is above 10%"
+  alarm_description   = "Alarm to scale out when CPU utilization is above 60%"
   alarm_actions       = [aws_autoscaling_policy.scale_out_policy.arn]
   dimensions = {
     InstanceId = var.dim_instance_id
@@ -74,11 +76,11 @@ resource "aws_cloudwatch_metric_alarm" "scale_in_cpu_alarm" {
   period              = 300  # 5 minutes
   statistic           = "Average"
   threshold           = 5
-  alarm_description   = "Alarm to scale in when CPU utilization is below 5%"
+  alarm_description   = "Alarm to scale in when CPU utilization is below 10%"
   alarm_actions       = [aws_autoscaling_policy.scale_in_policy.arn]
-  dimensions = {
-    InstanceId = var.dim_instance_id
-  }
+   dimensions = {
+     InstanceId = var.dim_instance_id
+   }
 }
 
 # Create Scaling Policy to scale out

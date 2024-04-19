@@ -2,9 +2,9 @@ variable "instance_id" {
   description = "ID of the source instance for creating AMI"
 }
 
-variable "dim_instance_id"{
-  description = "ID of the source instance for creating AMI"
-}
+# variable "dim_instance_id"{
+#   description = "ID of the source instance for creating AMI"
+# }
 
 variable "ami_name" {
   description = "Name of the AMI"
@@ -46,9 +46,9 @@ variable "max_size" {
   description = "Maximum size of the Auto Scaling Group"
 }
 
-variable "desired_capacity" {
-  description = "Desired capacity of the Auto Scaling Group"
-}
+# variable "desired_capacity" {
+#   description = "Desired capacity of the Auto Scaling Group"
+# }
 
 variable "subnet_ids" {
   type        = list(string)
@@ -86,3 +86,4 @@ variable "scale_in_cooldown" {
 variable "target_group_arn" {
   description = "ARN of the ALB target group"
 }
+
