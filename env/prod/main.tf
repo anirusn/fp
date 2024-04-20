@@ -166,7 +166,7 @@ module "group16_prod_instances" {
       instance_type     = "t3.medium"
       subnet_id         = module.group16_prod_subnets.subnet_ids[4]
       security_group_id = module.group16_prod_vms_sg.security_group_id
-      user_data         = file("/home/ec2-user/environment/terraform-project/vm_user_data.sh")
+      user_data         = file("/home/ec2-user/environment/terraform-project/vm_user_data_lt.sh")
       assign_public_ip  = false
       key_name          = aws_key_pair.group16_prod_key_pair.key_name
 
