@@ -10,7 +10,7 @@ terraform {
 
 # Defining key pair
 resource "aws_key_pair" "group16_staging_key_pair" {
-  key_name   = "acs730"
+  key_name   = "acs730-staging"
   public_key = file("/home/ec2-user/environment/terraform-project/key/acs730.pub")
 }
 
@@ -59,7 +59,7 @@ module "group16_staging_asg" {
   scale_in_policy_name         = "group16-staging-scale-in"
   scale_in_scaling_adjustment  = -1
   scale_in_cooldown            = 300
-  #dim_instance_id              = module.group16_staging_instances.instance_ids[1]
+  dim_instance_id              = module.group16_staging_instances.instance_ids[1]
   target_group_arn             = module.group16_staging_load_balancer.target_group_arn
 }
 
@@ -110,36 +110,6 @@ module "group16_staging_bastion_sg" {
 }
 
 
-
-#creating security group for staging bastion host
-module "group16_staging_alb_sg" {
-  source                     = "/home/ec2-user/environment/terraform-project/modules/security_group"
-  security_group_name        = "group16-staging-security-group_alb"
-  security_group_description = "Security group for staging environment"
-  vpc_id                     = module.group16_staging_vpc.vpc_id
-
-  ingress_rules = [
-    {
-      from_port   = 80
-      to_port     = 80
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    }
-
-  ]
-  egress_rules = [
-    {
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
-      cidr_blocks = ["0.0.0.0/0"]
-    }
-  ]
-}
-
-
-
-
 #creating security group for staging vms
 
 module "group16_staging_vms_sg" {
@@ -187,7 +157,7 @@ module "group16_staging_instances" {
       ami_id            = "ami-051f8a213df8bc089"
       instance_type     = "t3.small"
       subnet_id         = module.group16_staging_subnets.subnet_ids[0]
-      security_group_id = module.group16_staging_alb_sg.security_group_id
+      security_group_id = module.group16_staging_bastion_sg.security_group_id
       assign_public_ip  = true
       key_name          = aws_key_pair.group16_staging_key_pair.key_name
     },
@@ -259,7 +229,7 @@ module "group16_staging_route_table_associations" {
 
 
 #create load balancer:
-# Use the load balancer module
+#Use the load balancer module
 module "group16_staging_load_balancer" {
   source = "/home/ec2-user/environment/terraform-project/modules/loadbalancer"
 
@@ -270,12 +240,12 @@ module "group16_staging_load_balancer" {
   target_group_name                = "group16-staging-target-group"
   target_group_port                = 80
   vpc_id                           = module.group16_staging_vpc.vpc_id
-  health_check_path                = "/"
-  health_check_port                = "traffic-port"
-  health_check_interval            = 30
-  health_check_timeout             = 10
-  health_check_healthy_threshold   = 5
-  health_check_unhealthy_threshold = 10
+  # health_check_path                = "/"
+  # health_check_port                = "traffic-port"
+  # health_check_interval            = 30
+  # health_check_timeout             = 10
+  # health_check_healthy_threshold   = 5
+  # health_check_unhealthy_threshold = 10
   listener_port                    = 80
   listener_rule_priority           = 100
   listener_rule_path               = "/"

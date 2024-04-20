@@ -1,7 +1,7 @@
 #Terraform state file
 terraform {
   backend "s3" {
-    bucket  = "fpbucket730"
+    bucket  = "acs730-prod"
     key     = "terraform.tfstate"
     region  = "us-east-1"
     encrypt = true
@@ -10,7 +10,7 @@ terraform {
 
 # Defining key pair
 resource "aws_key_pair" "group16_prod_key_pair" {
-  key_name   = "acs730"
+  key_name   = "acs730-prod"
   public_key = file("/home/ec2-user/environment/terraform-project/key/acs730.pub")
 }
 
@@ -109,35 +109,6 @@ module "group16_prod_bastion_sg" {
   ]
 }
 
-
-
-#creating security group for prod bastion host
-module "group16_prod_alb_sg" {
-  source                     = "/home/ec2-user/environment/terraform-project/modules/security_group"
-  security_group_name        = "group16-prod-security-group_alb"
-  security_group_description = "Security group for prod environment"
-  vpc_id                     = module.group16_prod_vpc.vpc_id
-
-  ingress_rules = [
-    {
-      from_port   = 80
-      to_port     = 80
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    }
-
-  ]
-  egress_rules = [
-    {
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
-      cidr_blocks = ["0.0.0.0/0"]
-    }
-  ]
-}
-
-
 #creating security group for prod vms
 
 module "group16_prod_vms_sg" {
@@ -185,7 +156,7 @@ module "group16_prod_instances" {
       ami_id            = "ami-051f8a213df8bc089"
       instance_type     = "t3.medium"
       subnet_id         = module.group16_prod_subnets.subnet_ids[0]
-      security_group_id = module.group16_prod_alb_sg.security_group_id
+      security_group_id = module.group16_prod_bastion_sg.security_group_id
       assign_public_ip  = true
       key_name          = aws_key_pair.group16_prod_key_pair.key_name
     },
@@ -277,7 +248,7 @@ module "group16_prod_load_balancer" {
   listener_port                    = 80
   listener_rule_priority           = 100
   listener_rule_path               = "/"
-  #target_id                        = module.group16_prod_instances.instance_ids[1]
+  target_id                        = module.group16_prod_instances.instance_ids[1]
 }
 
 # Output the DNS name of the created ALB

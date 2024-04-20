@@ -59,9 +59,9 @@ resource "aws_lb_listener_rule" "example_listener_rule" {
   }
 }
 
-# Attach Target Group to Target
-# resource "aws_lb_target_group_attachment" "example_attachment" {
-#   target_group_arn = aws_lb_target_group.example_target_group.arn
-#   target_id        = var.target_id
-#   port             = 80
-# }
+#Attach Target Group to Target
+resource "aws_lb_target_group_attachment" "example_attachment" {
+  target_group_arn = aws_lb_target_group.example_target_group.arn
+  target_id        = var.target_id
+  port             = 80
+}

@@ -64,6 +64,6 @@ variable "listener_rule_path" {
   description = "Path pattern for the listener rule"
 }
 
-# variable "target_id" {
-#   description = "ID of the target to attach to the target group"
-# }
+variable "target_id" {
+  description = "ID of the target to attach to the target group"
+}
